@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "react",
+    "outDir": "./dist",
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true, // 大規模なプロジェクトではビルド時間を短縮
+    "allowSyntheticDefaultImports": true, // デフォルトインポートを許可
+    "noEmit": true, // コンパイル時にファイルを出力しない（React Nativeでは通常不要）
+    "isolatedModules": true // 各ファイルを個別のモジュールとして扱う（高速化に役立つ）
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "extends": "@tsconfig/react-native/tsconfig.json"
+}

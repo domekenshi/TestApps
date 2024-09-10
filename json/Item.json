@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Todoリスト",
+    "root": "Todo",
+    "subItem": []
+  },
+  {
+    "name": "Detail",
+    "root": "Detail",
+    "subItem": []
+  },
+  {
+    "name": "Animation",
+    "root": "Animation",
+    "subItem": [
+      {
+        "name": "sub1",
+        "root": "sub1"
+      },
+      {
+        "name": "sub2",
+        "root": "sub2"
+      }
+    ]
+  },
+  {
+    "name": "Scaling",
+    "root": "Scaling",
+    "subItem": []
+  },
+  {
+    "name": "項目5",
+    "root": "Detail",
+    "subItem": []
+  },
+  {
+    "name": "項目6",
+    "root": "Detail",
+    "subItem": []
+  }
+]
