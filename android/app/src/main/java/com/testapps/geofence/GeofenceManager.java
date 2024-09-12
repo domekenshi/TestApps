@@ -6,15 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +30,9 @@ public class GeofenceManager {
     // Androidアプリケーションの現在の状態に関する情報を提供するインターフェース
     // リソース、データベース、プリファレンスへのアクセスを可能にする
     // アプリケーションレベルの操作（アクティビティの起動、インテントのブロードキャストなど）を実行できる
-    private Context context;
-    private GeofencingClient geofencingClient;
+    private final Context context;
+    private final GeofencingClient geofencingClient;
     private PendingIntent geofencePendingIntent;
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
-    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     /**
      * コンストラクタ
@@ -87,18 +82,12 @@ public class GeofenceManager {
 //        geofencingRequestは追加したいGeofenceの詳細を含んでいます。
 //        getGeofencePendingIntent()は、Geofenceイベントが発生したときに実行されるPendingIntentを提供します。
         geofencingClient.addGeofences(geofencingRequest, getGeofencePendingIntent())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Geofences added successfully
-                    }
+                .addOnSuccessListener(aVoid -> {
+                    // Geofences added successfully
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        // Failed to add geofences
+                .addOnFailureListener(e -> {
+                    // Failed to add geofences
 //                        失敗時の処理（エラーログの記録、ユーザーへの通知など）を実装
-                    }
                 });
     }
 

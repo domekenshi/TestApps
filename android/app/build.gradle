@@ -73,12 +73,12 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 android {
     sourceSets {
         main {
-            java.srcDirs = ['src/main/java', 'src/main/java/com/testapps/Geofence']
+            java.srcDirs = ['src/main/java', 'src/main/java/com/testapps/geofence']
         }
     }
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+//    compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.testapps"
     defaultConfig {
@@ -114,7 +114,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-    implementation 'androidx.core:core:1.7.0'
+    implementation 'androidx.core:core:1.13.1'
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
