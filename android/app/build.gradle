@@ -3,7 +3,9 @@ apply plugin: "com.facebook.react"
 
 /**
  * This is the configuration block to customize your React Native Android app.
+ * これは、React Native Android アプリをカスタマイズするための構成ブロックです。
  * By default you don't need to apply any configuration, just uncomment the lines you need.
+ * デフォルトでは、構成を適用する必要はなく、必要な行のコメントを解除するだけです。
  */
 react {
     /* Folders */
@@ -69,6 +71,11 @@ def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java/com/testapps/Geofence']
+        }
+    }
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
