@@ -2,26 +2,26 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
 /**
- * This is the configuration block to customize your React Native Android app.
  * これは、React Native Android アプリをカスタマイズするための構成ブロックです。
- * By default you don't need to apply any configuration, just uncomment the lines you need.
  * デフォルトでは、構成を適用する必要はなく、必要な行のコメントを解除するだけです。
  */
 react {
+    // React Native 特有の設定を行うブロック
+    // 多くの設定はコメントアウトされており、必要に応じて有効化できます。
     /* Folders */
-    //   The root of your project, i.e. where "package.json" lives. Default is '..'
+    // プロジェクトのルート、つまり「package.json」が存在する場所。デフォルトは '..' です。
     // root = file("../")
-    //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
+    // react-native NPM パッケージがあるフォルダー。デフォルトは ../node_modules/react-native です。
     // reactNativeDir = file("../node_modules/react-native")
-    //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
+    // react-native Codegen パッケージがあるフォルダ
     // codegenDir = file("../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
+    // React Native CLI エントリポイントである cli.js ファイル。デフォルトは ../node_modules/react-native/cli.js です。
     // cliFile = file("../node_modules/react-native/cli.js")
 
     /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
-    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
-    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    // デバッグ可能なバリアントのリスト。これらについては、
+    // JS バンドルとアセットのバンドルをスキップします。デフォルトでは「debug」のみです。
+    // lite、prod などのフレーバーを追加する場合は、debuggableVariants をリストする必要があります。
     // debuggableVariants = ["liteDebug", "prodDebug"]
 
     /* Bundling */
@@ -53,57 +53,74 @@ react {
 }
 
 /**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ * これを true に設定すると、リリース ビルドで Proguard が実行され、Java バイトコードが縮小されます。
  */
 def enableProguardInReleaseBuilds = false
 
 /**
- * The preferred build flavor of JavaScriptCore (JSC)
- *
- * For example, to use the international variant, you can use:
- * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
- *
- * The international variant includes ICU i18n library and necessary data
- * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
- * give correct results when using with locales other than en-US. Note that
- * this variant is about 6MiB larger per architecture than default.
+* JavaScriptCore (JSC) の推奨ビルド フレーバー
+*
+* たとえば、国際版バリアントを使用するには、次を使用します:
+* `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+*
+* 国際版バリアントには、ICU i18n ライブラリと必要なデータが含まれています。
+* たとえば、en-US 以外のロケールで使用する場合に正しい結果を提供する `Date.toLocaleString` や
+* `String.localeCompare` を使用できます。
+* このバリアントは、デフォルトよりもアーキテクチャごとに約 6MiB 大きくなります。
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java', 'src/main/java/com/testapps/geofence']
-        }
-    }
+    // Android NDK (Native Development Kit) のバージョンを設定
     ndkVersion rootProject.ext.ndkVersion
 
-//    compileSdkVersion rootProject.ext.compileSdkVersion
+    // コンパイルに使用するSDKバージョンを設定
+   compileSdkVersion rootProject.ext.compileSdkVersion
 
+    // アプリケーションのJavaパッケージ名を設定
     namespace "com.testapps"
+
+    // アプリケーションのデフォルト設定
     defaultConfig {
+        // アプリケーションのユニークな識別子
         applicationId "com.testapps"
+        // サポートする最小のSDKバージョン
         minSdkVersion rootProject.ext.minSdkVersion
+        // アプリケーションのターゲットSDKバージョン
         targetSdkVersion rootProject.ext.targetSdkVersion
+         // アプリケーションのバージョンコード（内部用）
         versionCode 1
+         // アプリケーションのバージョン名（ユーザー向け）
         versionName "1.0"
     }
+     // 署名設定
     signingConfigs {
+        // デバッグビルド用の署名設定
         debug {
+            // デバッグ用のキーストアファイルの場所
             storeFile file('debug.keystore')
+            // キーストアのパスワード
             storePassword 'android'
+             // 使用するキーのエイリアス
             keyAlias 'androiddebugkey'
+            // キーのパスワード
             keyPassword 'android'
         }
     }
+     // ビルドタイプの設定
     buildTypes {
+        // デバッグビルドの設定
         debug {
+             // デバッグビルド用の署名設定を使用
             signingConfig signingConfigs.debug
         }
+        // リリースビルドの設定
         release {
-            // Caution! In production, you need to generate your own keystore file.
+            // 注意：本番環境では独自のキーストアファイルを生成する必要があります
+            // デバッグ用の署名設定を使用（本番環境では変更が必要）
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
+            // コード難読化を有効にするかどうか
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
