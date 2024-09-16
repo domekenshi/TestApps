@@ -65,8 +65,8 @@ public class GeofenceManager {
         // 監視したいGeofenceのリストと、それらのGeofenceに関連するトリガー条件を含むオブジェクト
         GeofencingRequest geofencingRequest = buildGeofencingRequest(geofenceList);
 
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -77,20 +77,28 @@ public class GeofenceManager {
             return;
         }
 
-//        指定されたGeofenceを追加するリクエストを送信します。
-//        Geofenceの追加は非同期で行われるため、メインスレッドをブロックしません
-//        geofencingRequestは追加したいGeofenceの詳細を含んでいます。
-//        getGeofencePendingIntent()は、Geofenceイベントが発生したときに実行されるPendingIntentを提供します。
+        //        指定されたGeofenceを追加するリクエストを送信します。
+        //        Geofenceの追加は非同期で行われるため、メインスレッドをブロックしません
+        //        geofencingRequestは追加したいGeofenceの詳細を含んでいます。
+        //        getGeofencePendingIntent()は、Geofenceイベントが発生したときに実行されるPendingIntentを提供します。
         geofencingClient.addGeofences(geofencingRequest, getGeofencePendingIntent())
                 .addOnSuccessListener(aVoid -> {
                     // Geofences added successfully
                 })
                 .addOnFailureListener(e -> {
                     // Failed to add geofences
-//                        失敗時の処理（エラーログの記録、ユーザーへの通知など）を実装
+                    //                        失敗時の処理（エラーログの記録、ユーザーへの通知など）を実装
                 });
     }
 
+    /**
+     * ジオフェンス構築
+     * @param latitude
+     * @param longitude
+     * @param radius
+     * @param geofenceId
+     * @return
+     */
     private Geofence buildGeofence(double latitude, double longitude, float radius, String geofenceId) {
         return new Geofence.Builder()
                 .setRequestId(geofenceId) // ジオフェンスに一意のIDを設定します。このIDは後でジオフェンスを識別するために使用されます。
@@ -100,7 +108,11 @@ public class GeofenceManager {
                 .build();
     }
 
-    //GeofencingRequestは、Geofenceの監視を開始するために必要な情報をまとめたオブジェクト
+    /**
+     * GeofencingRequestは、Geofenceの監視を開始するために必要な情報をまとめたオブジェクト
+     * @param geofenceList
+     * @return
+     */
     private GeofencingRequest buildGeofencingRequest(List<Geofence> geofenceList) {
         return new GeofencingRequest.Builder()
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
@@ -108,7 +120,10 @@ public class GeofenceManager {
                 .build();
     }
 
-    //    Geofenceイベントが発生したときに実行されるPendingIntentを生成または取得するためのもの
+    /**
+     * Geofenceイベントが発生したときに実行されるPendingIntentを生成または取得するためのもの
+     * @return
+     */
     private PendingIntent getGeofencePendingIntent() {
 //        キャッシュチェック
         if (geofencePendingIntent != null) {
