@@ -21,6 +21,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive start");
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         // NullPointerExceptionの回避
         Optional.ofNullable(geofencingEvent)
@@ -53,6 +54,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                         }
                     }
                 });
+        Log.d(TAG, "onReceive end");
     }
 
     /**

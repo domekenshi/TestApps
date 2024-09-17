@@ -1,6 +1,7 @@
 <!-- Androidアプリケーションの構成情報を記述 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-<!-- 通常（Normal）パーミッション -->
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 通常（Normal）パーミッション -->
     <!-- インターネット通信を許可 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -9,7 +10,7 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" /> -->
-<!-- 危険（Dangerous）パーミッション -->
+    <!-- 危険（Dangerous）パーミッション -->
     <!-- 位置情報 -->
     <!-- 正確な位置情報へのアクセス許可 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -42,31 +43,40 @@
     <!-- ストレージ -->
     <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
-<!-- 特殊パーミッション -->
+    <!-- 特殊パーミッション -->
     <!-- <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" /> -->
-<!-- 署名（Signature）パーミッション -->
+    <!-- 署名（Signature）パーミッション -->
     <!-- <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
     <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" /> -->
-
+    <!-- 通知 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-      android:name=".MainApplication"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      android:roundIcon="@mipmap/ic_launcher_round"
-      android:allowBackup="false"
-      android:theme="@style/AppTheme">
-      <activity
-        android:name=".MainActivity"
+        android:name=".MainApplication"
         android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-        android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize"
-        android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-      </activity>
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:allowBackup="false"
+        android:theme="@style/AppTheme"
+        tools:ignore="DataExtractionRules">
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver
+            android:name=".geofence.GeofenceBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.testapps.ACTION_GEOFENCE_EVENT" />
+            </intent-filter>
+        </receiver>
     </application>
+
 </manifest>

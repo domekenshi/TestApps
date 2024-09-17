@@ -1,10 +1,13 @@
 package com.testapps.geofence;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
@@ -23,6 +26,8 @@ import java.util.List;
  * Geofenceの追加、削除、更新などの操作を提供
  */
 public class GeofenceManager {
+    private static final String TAG = "GeofenceManager";
+    private static final int REQUEST_LOCATION_PERMISSION = 1001; // 任意の一意な値でOK
     // アプリケーションコンテキスト
     // アプリケーション全体の設定や状態を保持する
     // ビーンの管理、イベント発行、メッセージソースへのアクセスなどの機能を提供
@@ -31,15 +36,17 @@ public class GeofenceManager {
     // リソース、データベース、プリファレンスへのアクセスを可能にする
     // アプリケーションレベルの操作（アクティビティの起動、インテントのブロードキャストなど）を実行できる
     private final Context context;
+    private final Activity activity;
     private final GeofencingClient geofencingClient;
     private PendingIntent geofencePendingIntent;
 
     /**
      * コンストラクタ
      */
-    public GeofenceManager(Context context) {
+    public GeofenceManager(Context context, Activity activity) {
         // 後でAndroidシステムサービス(アプリケーションコンテキスト）にアクセスしたり、リソースを取得したりする際に使用
         this.context = context;
+        this.activity = activity;
         // GeofencingClient は、Geofence を追加、削除、Geofenceイベントの監視をするための主要なクラス
         // Context を外部から注入することで、テストの容易性や柔軟性が向上します。
         // Geofenceの追加や削除は非同期で行われ、結果はコールバックで通知されます。
@@ -56,24 +63,25 @@ public class GeofenceManager {
      * ジオフェンス生成と追加
      */
     public void createAndAddGeofence(double latitude, double longitude, float radius, String geofenceId) {
+        Log.d(TAG, "createAndAddGeofence start");
+
+        // GeofenceのIDのリストで削除
+//        List<String> geofenceIds = Arrays.asList("geofence1", "geofence2");
+//        geofencingClient.removeGeofences(geofenceIds)
+//                .addOnSuccessListener(ContextCompat.getMainExecutor(context), aVoid -> Log.d(TAG, "Geofencesが正常に削除された"))
+//                .addOnFailureListener(ContextCompat.getMainExecutor(context), e -> Log.d(TAG, "Geofencesの削除に失敗した"));
+
         // ジオフェンス作成
         Geofence geofence = buildGeofence(latitude, longitude, radius, geofenceId);
         List<Geofence> geofenceList = new ArrayList<>();
         // ジオフェンスリストに追加
         geofenceList.add(geofence);
-
+        Log.d(TAG, "geofenceList" + geofenceList);
         // 監視したいGeofenceのリストと、それらのGeofenceに関連するトリガー条件を含むオブジェクト
         GeofencingRequest geofencingRequest = buildGeofencingRequest(geofenceList);
 
-        if (ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
             return;
         }
 
@@ -82,22 +90,19 @@ public class GeofenceManager {
         //        geofencingRequestは追加したいGeofenceの詳細を含んでいます。
         //        getGeofencePendingIntent()は、Geofenceイベントが発生したときに実行されるPendingIntentを提供します。
         geofencingClient.addGeofences(geofencingRequest, getGeofencePendingIntent())
-                .addOnSuccessListener(aVoid -> {
-                    // Geofences added successfully
-                })
-                .addOnFailureListener(e -> {
-                    // Failed to add geofences
-                    //                        失敗時の処理（エラーログの記録、ユーザーへの通知など）を実装
-                });
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, "Geofences added successfully", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "Failed to add geofences", Toast.LENGTH_SHORT).show());
+        Log.d(TAG, "createAndAddGeofence end");
     }
 
     /**
      * ジオフェンス構築
-     * @param latitude
-     * @param longitude
-     * @param radius
-     * @param geofenceId
-     * @return
+     *
+     * @param latitude   経度
+     * @param longitude  緯度
+     * @param radius     半径
+     * @param geofenceId ジオフェンスID
+     * @return ジオフェンス
      */
     private Geofence buildGeofence(double latitude, double longitude, float radius, String geofenceId) {
         return new Geofence.Builder()
@@ -110,8 +115,9 @@ public class GeofenceManager {
 
     /**
      * GeofencingRequestは、Geofenceの監視を開始するために必要な情報をまとめたオブジェクト
-     * @param geofenceList
-     * @return
+     *
+     * @param geofenceList ジオフェンスリスト
+     * @return ジオフェンス作成リクエスト
      */
     private GeofencingRequest buildGeofencingRequest(List<Geofence> geofenceList) {
         return new GeofencingRequest.Builder()
@@ -122,16 +128,19 @@ public class GeofenceManager {
 
     /**
      * Geofenceイベントが発生したときに実行されるPendingIntentを生成または取得するためのもの
-     * @return
+     *
+     * @return ペンディングインテント
      */
     private PendingIntent getGeofencePendingIntent() {
 //        キャッシュチェック
         if (geofencePendingIntent != null) {
+            Log.d(TAG, "キャッシュチェック:あり");
             return geofencePendingIntent;
         }
 //        GeofenceイベントをハンドリングするためのIntentを作成
         Intent intent = new Intent(context, GeofenceBroadcastReceiver.class);
-        geofencePendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.setAction("com.testapps.ACTION_GEOFENCE_EVENT");
+        geofencePendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return geofencePendingIntent;
     }
 }
