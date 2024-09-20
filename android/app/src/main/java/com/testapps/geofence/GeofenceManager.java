@@ -121,7 +121,7 @@ public class GeofenceManager {
      */
     private GeofencingRequest buildGeofencingRequest(List<Geofence> geofenceList) {
         return new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT)
                 .addGeofences(geofenceList)
                 .build();
     }

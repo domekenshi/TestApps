@@ -58,24 +58,24 @@ react {
 def enableProguardInReleaseBuilds = false
 
 /**
-* JavaScriptCore (JSC) の推奨ビルド フレーバー
-*
-* たとえば、国際版バリアントを使用するには、次を使用します:
-* `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
-*
-* 国際版バリアントには、ICU i18n ライブラリと必要なデータが含まれています。
-* たとえば、en-US 以外のロケールで使用する場合に正しい結果を提供する `Date.toLocaleString` や
-* `String.localeCompare` を使用できます。
-* このバリアントは、デフォルトよりもアーキテクチャごとに約 6MiB 大きくなります。
+ * JavaScriptCore (JSC) の推奨ビルド フレーバー
+ *
+ * たとえば、国際版バリアントを使用するには、次を使用します:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * 国際版バリアントには、ICU i18n ライブラリと必要なデータが含まれています。
+ * たとえば、en-US 以外のロケールで使用する場合に正しい結果を提供する `Date.toLocaleString` や
+ * `String.localeCompare` を使用できます。
+ * このバリアントは、デフォルトよりもアーキテクチャごとに約 6MiB 大きくなります。
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
     // Android NDK (Native Development Kit) のバージョンを設定
     ndkVersion rootProject.ext.ndkVersion
-
+    namespace "com.agontuk.RNFusedLocation"
     // コンパイルに使用するSDKバージョンを設定
-   compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     // アプリケーションのJavaパッケージ名を設定
     namespace "com.testapps"
@@ -88,12 +88,12 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         // アプリケーションのターゲットSDKバージョン
         targetSdkVersion rootProject.ext.targetSdkVersion
-         // アプリケーションのバージョンコード（内部用）
+        // アプリケーションのバージョンコード（内部用）
         versionCode 1
-         // アプリケーションのバージョン名（ユーザー向け）
+        // アプリケーションのバージョン名（ユーザー向け）
         versionName "1.0"
     }
-     // 署名設定
+    // 署名設定
     signingConfigs {
         // デバッグビルド用の署名設定
         debug {
@@ -101,17 +101,17 @@ android {
             storeFile file('debug.keystore')
             // キーストアのパスワード
             storePassword 'android'
-             // 使用するキーのエイリアス
+            // 使用するキーのエイリアス
             keyAlias 'androiddebugkey'
             // キーのパスワード
             keyPassword 'android'
         }
     }
-     // ビルドタイプの設定
+    // ビルドタイプの設定
     buildTypes {
         // デバッグビルドの設定
         debug {
-             // デバッグビルド用の署名設定を使用
+            // デバッグビルド用の署名設定を使用
             signingConfig signingConfigs.debug
         }
         // リリースビルドの設定

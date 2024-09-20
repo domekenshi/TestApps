@@ -23,9 +23,11 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive start");
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        Log.d(TAG, "geofencingEvent:" + geofencingEvent);
         // NullPointerExceptionの回避
         Optional.ofNullable(geofencingEvent)
                 .ifPresent(event -> {
+                    Log.d(TAG, "event:" + event);
                     if (event.hasError()) {
                         // エラー処理
                         String errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.getErrorCode());

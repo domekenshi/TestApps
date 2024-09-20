@@ -9,4 +9,5 @@ export type RootStackParamList = {
   Detail: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
   Animation: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
   Scaling: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
+  LocationScreen: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
 };
