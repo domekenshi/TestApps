@@ -1,4 +1,5 @@
 {
+  "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -13,6 +14,5 @@
     "isolatedModules": true // 各ファイルを個別のモジュールとして扱う（高速化に役立つ）
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"],
-  "extends": "@tsconfig/react-native/tsconfig.json"
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
