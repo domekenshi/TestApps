@@ -21,3 +21,7 @@ rm -rf node_modules
 ```
 ./gradlew clean
 ```
+
+```
+git checkout -b
+```
