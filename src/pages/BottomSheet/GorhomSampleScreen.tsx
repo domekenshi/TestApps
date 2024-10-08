@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 
 // デフォルトのContentコンポーネント
@@ -17,21 +17,54 @@ const DefaultContent = () => (
 const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-
+  const headerOpacity = useRef(new Animated.Value(0)).current;
   // スナップポイントの設定
   const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
 
   // ボトムシートの状態が変化したときのコールバック
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-    setIsFullyExpanded(index === 2); // 100%のときはindex 2
-  }, []);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      console.log('handleSheetChanges', index);
+      setIsFullyExpanded(index === 2); // 100%のときはindex 2
+
+      // ヘッダーのアニメーション
+      Animated.timing(headerOpacity, {
+        toValue: isFullyExpanded ? 1 : 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    },
+    [headerOpacity, isFullyExpanded],
+  );
 
   const handleVButtonPress = useCallback(() => {
     if (isFullyExpanded) {
       bottomSheetRef.current?.snapToIndex(1); // 50%に戻す
     }
   }, [isFullyExpanded]);
+
+  const renderHeader = () => (
+    <Animated.View
+      style={[
+        styles.header,
+        {
+          opacity: headerOpacity,
+          zIndex: 10000,
+          transform: [
+            {
+              translateY: headerOpacity.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-50, 0], // ヘッダーが上から下に移動
+              }),
+            },
+          ],
+        },
+      ]}>
+      <TouchableOpacity style={styles.vButton} onPress={handleVButtonPress}>
+        <Text style={styles.vButtonText}>V</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
 
   return (
     <View style={styles.container}>
@@ -51,14 +84,10 @@ const Gorhom = ({Content = DefaultContent}) => {
         handleComponent={null} // ヘッダーを削除
         onChange={handleSheetChanges}
         enablePanDownToClose={false}
-        enableContentPanningGesture={!isFullyExpanded}
+        // enableContentPanningGesture={!isFullyExpanded}
         enableOverDrag={!isFullyExpanded}>
         {/* 戻るボタン */}
-        {isFullyExpanded ? (
-          <TouchableOpacity style={styles.vButton} onPress={handleVButtonPress}>
-            <Text style={styles.vButtonText}>V</Text>
-          </TouchableOpacity>
-        ) : null}
+        {isFullyExpanded ? renderHeader() : null}
         <View style={styles.contentContainer}>
           <BottomSheetScrollView
             contentContainerStyle={styles.contentContainer}>
@@ -133,6 +162,10 @@ const styles = StyleSheet.create({
   item: {
     fontSize: 16,
     marginBottom: 8,
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 
