@@ -13,6 +13,7 @@ import Todo from './src/pages/Todo';
 import Animation from './src/pages/Animations/Animation';
 import Scaling from './src/pages/Scaling';
 import Detail from './src/pages/detail';
+import ReAnimated from './src/pages/ReAnimated/ReAnimated';
 
 const Stack = createStackNavigator<RootStackParamList>();
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Stack.Screen name="Detail" component={Detail} />
         <Stack.Screen name="Animation" component={Animation} />
         <Stack.Screen name="Scaling" component={Scaling} />
+        <Stack.Screen name="ReAnimated" component={ReAnimated} />
       </Stack.Navigator>
     </NavigationContainer>
   );
