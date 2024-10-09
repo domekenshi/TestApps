@@ -1,8 +1,12 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
-// デフォルトのContentコンポーネント
 const DefaultContent = () => (
   <View style={styles.defaultContent}>
     <Text style={styles.title}>デフォルトのボトムシート内容</Text>
@@ -13,81 +17,63 @@ const DefaultContent = () => (
     ))}
   </View>
 );
+// AnimatedTouchableOpacity を作成
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
 const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-  const headerOpacity = useRef(new Animated.Value(0)).current;
-  // スナップポイントの設定
+  const opacity = useSharedValue(0); // ReanimatedのsharedValueを使う
+
   const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
 
-  // ボトムシートの状態が変化したときのコールバック
   const handleSheetChanges = useCallback(
     (index: number) => {
       console.log('handleSheetChanges', index);
-      setIsFullyExpanded(index === 2); // 100%のときはindex 2
-
-      // ヘッダーのアニメーション
-      Animated.timing(headerOpacity, {
-        toValue: isFullyExpanded ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      setIsFullyExpanded(index === 2);
+      opacity.value = withTiming(index === 2 ? 1 : 0, {duration: 300}); // 透明度のアニメーション
     },
-    [headerOpacity, isFullyExpanded],
+    [opacity],
   );
 
   const handleVButtonPress = useCallback(() => {
     if (isFullyExpanded) {
-      bottomSheetRef.current?.snapToIndex(1); // 50%に戻す
+      bottomSheetRef.current?.snapToIndex(1);
     }
   }, [isFullyExpanded]);
 
-  const renderHeader = () => (
-    <Animated.View
-      style={[
-        styles.header,
-        {
-          opacity: headerOpacity,
-          zIndex: 10000,
-          transform: [
-            {
-              translateY: headerOpacity.interpolate({
-                inputRange: [0, 1],
-                outputRange: [-50, 0], // ヘッダーが上から下に移動
-              }),
-            },
-          ],
-        },
-      ]}>
-      <TouchableOpacity style={styles.vButton} onPress={handleVButtonPress}>
-        <Text style={styles.vButtonText}>V</Text>
-      </TouchableOpacity>
-    </Animated.View>
-  );
+  // アニメーションスタイル
+  const animatedVButtonStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
 
   return (
     <View style={styles.container}>
+      <AnimatedTouchableOpacity
+        style={[styles.vButton, animatedVButtonStyle]}
+        onPress={handleVButtonPress}>
+        <Text style={styles.vButtonText}>V</Text>
+      </AnimatedTouchableOpacity>
+
       <View style={styles.bottonContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            bottomSheetRef.current?.snapToIndex(1);
+          }}>
           <Text style={styles.button}>botton</Text>
         </TouchableOpacity>
       </View>
+
       <BottomSheet
-        backgroundStyle={{
-          borderWidth: 1,
-          borderRadius: 0,
-        }}
+        backgroundStyle={styles.buttomSheetStyle}
         ref={bottomSheetRef}
         index={1}
         snapPoints={snapPoints}
-        handleComponent={null} // ヘッダーを削除
         onChange={handleSheetChanges}
-        enablePanDownToClose={false}
-        // enableContentPanningGesture={!isFullyExpanded}
-        enableOverDrag={!isFullyExpanded}>
-        {/* 戻るボタン */}
-        {isFullyExpanded ? renderHeader() : null}
+        enablePanDownToClose={true}>
         <View style={styles.contentContainer}>
           <BottomSheetScrollView
             contentContainerStyle={styles.contentContainer}>
@@ -102,7 +88,6 @@ const Gorhom = ({Content = DefaultContent}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     backgroundColor: '#e0f9e5',
   },
   bottonContainer: {
@@ -117,6 +102,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
   },
+  buttomSheetStyle: {
+    borderWidth: 1,
+    borderRadius: 0,
+  },
   contentContainer: {
     flex: 1,
     alignItems: 'center',
@@ -129,6 +118,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
   panelHandle: {
     width: 40,
@@ -138,13 +132,12 @@ const styles = StyleSheet.create({
   },
   vButton: {
     zIndex: 1000,
-    borderRadius: 20,
-    width: 40,
+    borderRadius: 0,
+    width: '100%',
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
     paddingLeft: 20,
     paddingTop: 10,
+    backgroundColor: 'white',
   },
   vButtonText: {
     color: '#000000',
