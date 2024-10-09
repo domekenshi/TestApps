@@ -1,94 +1,154 @@
-import React, {useRef, useMemo} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import BottomSheet, {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
+import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  runOnUI,
-  PanGestureHandler,
-  GestureHandlerRootView,
 } from 'react-native-reanimated';
 
-const Gorhom = () => {
+const DefaultContent = () => (
+  <View style={styles.defaultContent}>
+    <Text style={styles.title}>デフォルトのボトムシート内容</Text>
+    {[...Array(20)].map((_, i) => (
+      <Text key={i} style={styles.item}>
+        アイテム {i + 1}
+      </Text>
+    ))}
+  </View>
+);
+// AnimatedTouchableOpacity を作成
+// const AnimatedTouchableOpacity =
+//   Animated.createAnimatedComponent(TouchableOpacity);
+
+const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['50%', '90%'], []);
-  const translateY = useSharedValue(0); // ボトムシートのY軸の位置
-  const animatedOpacity = useSharedValue(1); // アニメーションの透明度
+  const [isFullyExpanded, setIsFullyExpanded] = useState(false);
+  const opacity = useSharedValue(0); // ReanimatedのsharedValueを使う
 
-  const handleSheetChange = index => {
-    console.log('Bottom Sheet Index:', index);
-  };
+  const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
 
-  const animatedHeaderStyle = useAnimatedStyle(() => {
-    return {
-      opacity: animatedOpacity.value,
-      transform: [{translateY: translateY.value}],
-    };
-  });
+  const handleSheetChanges = useCallback(index => {
+    console.log('handleSheetChanges', index);
+    setIsFullyExpanded(index === 2);
+    // opacity.value = withTiming(index === 2 ? 1 : 0, {duration: 300}); // 透明度のアニメーション
+  }, []);
 
-  const handleGestureEvent = event => {
-    // ドラッグ位置を取得
-    const {translationY} = event.nativeEvent;
-
-    // translateYの値を更新
-    translateY.value = translationY;
-
-    // ドラッグ位置に応じて透明度を変更
-    if (translationY < 0) {
-      animatedOpacity.value = withTiming(1); // 上にドラッグしたときはヘッダーを見せる
-    } else {
-      animatedOpacity.value = withTiming(1 - translationY / 100); // 下にドラッグしたときはヘッダーを隠す
+  const handleVButtonPress = useCallback(() => {
+    if (isFullyExpanded) {
+      bottomSheetRef.current?.snapToIndex(1);
     }
-  };
+  }, [isFullyExpanded, bottomSheetRef]);
+
+  // アニメーションスタイル
 
   return (
-    <BottomSheetModalProvider>
-      <GestureHandlerRootView style={styles.container}>
-        <View style={[styles.header, animatedHeaderStyle]}>
-          <Text style={styles.headerText}>ヘッダー</Text>
-        </View>
+    <View style={styles.container}>
+      <Animated.View style={[styles.vButton]} onPress={handleVButtonPress}>
+        <Text style={styles.vButtonText}>V</Text>
+      </Animated.View>
 
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={0}
-          snapPoints={snapPoints}
-          onChange={handleSheetChange}
-          onGestureEvent={handleGestureEvent} // ドラッグ時にアニメーションを更新
-        >
-          <View style={styles.content}>
-            <Text>Bottom Sheetのコンテンツ</Text>
-          </View>
-        </BottomSheet>
-      </GestureHandlerRootView>
-    </BottomSheetModalProvider>
+      <View style={styles.bottonContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            bottomSheetRef.current?.snapToIndex(1);
+          }}>
+          <Text style={styles.button}>botton</Text>
+        </TouchableOpacity>
+      </View>
+
+      <BottomSheet
+        backgroundStyle={styles.buttomSheetStyle}
+        ref={bottomSheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        enablePanDownToClose={true}>
+        <View style={styles.contentContainer}>
+          <BottomSheetScrollView
+            contentContainerStyle={styles.contentContainer}>
+            <Content />
+          </BottomSheetScrollView>
+        </View>
+      </BottomSheet>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#e0f9e5',
+  },
+  bottonContainer: {
+    flex: 1,
+    backgroundColor: '#b3edf3',
     alignItems: 'center',
+    paddingTop: 150,
+  },
+  button: {
+    fontSize: 30,
+    backgroundColor: '#eaa0a0',
+    borderRadius: 15,
+    padding: 10,
+  },
+  buttomSheetStyle: {
+    borderWidth: 1,
+    borderRadius: 0,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 30,
   },
   header: {
+    backgroundColor: 'white',
+    paddingTop: 20,
+    paddingBottom: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    alignItems: 'center',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 60,
-    backgroundColor: '#6200ee',
-    justifyContent: 'center',
-    alignItems: 'center',
+    zIndex: 10,
+  },
+  panelHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 2,
+  },
+  vButton: {
+    zIndex: 1000,
+    borderRadius: 0,
+    width: '100%',
+    height: 40,
+    paddingLeft: 20,
+    paddingTop: 10,
+    backgroundColor: 'white',
+  },
+  vButtonText: {
+    color: '#000000',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  defaultContent: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  item: {
+    fontSize: 16,
+    marginBottom: 8,
   },
   headerText: {
-    color: '#fff',
     fontSize: 20,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontWeight: 'bold',
   },
 });
 
