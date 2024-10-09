@@ -1,12 +1,19 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
-import {
+import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedReaction,
   withTiming,
+  Easing,
+  runOnJS,
 } from 'react-native-reanimated';
 
+/**
+ * ダミー
+ * @returns
+ */
 const DefaultContent = () => (
   <View style={styles.defaultContent}>
     <Text style={styles.title}>デフォルトのボトムシート内容</Text>
@@ -17,36 +24,66 @@ const DefaultContent = () => (
     ))}
   </View>
 );
-// AnimatedTouchableOpacity を作成
-// const AnimatedTouchableOpacity =
-//   Animated.createAnimatedComponent(TouchableOpacity);
+
+// アニメーション用のTouchableOpacity;作成
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
 const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef(null);
   const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-  const opacity = useSharedValue(0); // ReanimatedのsharedValueを使う
-
   const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
+  const animatedPosition = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
 
   const handleSheetChanges = useCallback(index => {
-    console.log('handleSheetChanges', index);
+    // 100％
     setIsFullyExpanded(index === 2);
-    // opacity.value = withTiming(index === 2 ? 1 : 0, {duration: 300}); // 透明度のアニメーション
   }, []);
 
   const handleVButtonPress = useCallback(() => {
     if (isFullyExpanded) {
       bottomSheetRef.current?.snapToIndex(1);
     }
-  }, [isFullyExpanded, bottomSheetRef]);
+  }, [isFullyExpanded]);
 
-  // アニメーションスタイル
+  const logPosition = useCallback(position => {
+    console.log('Current animatedPosition:', position);
+  }, []);
+
+  useAnimatedReaction(
+    () => animatedPosition.value,
+    position => {
+      let newOpacity;
+      if (position <= 0) {
+        newOpacity = 1;
+      } else if (position >= 100) {
+        newOpacity = 0;
+      } else {
+        newOpacity = 1 - position / 100;
+      }
+
+      opacity.value = withTiming(newOpacity, {
+        duration: 30,
+        easing: Easing.out(Easing.cubic),
+      });
+      runOnJS(logPosition)(position);
+    },
+  );
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.vButton]} onPress={handleVButtonPress}>
+      <AnimatedTouchableOpacity
+        style={[styles.vButton, animatedStyle]}
+        onPress={handleVButtonPress}>
         <Text style={styles.vButtonText}>V</Text>
-      </Animated.View>
+      </AnimatedTouchableOpacity>
 
       <View style={styles.bottonContainer}>
         <TouchableOpacity
@@ -62,14 +99,12 @@ const Gorhom = ({Content = DefaultContent}) => {
         ref={bottomSheetRef}
         index={1}
         snapPoints={snapPoints}
+        animatedPosition={animatedPosition}
         onChange={handleSheetChanges}
         enablePanDownToClose={true}>
-        <View style={styles.contentContainer}>
-          <BottomSheetScrollView
-            contentContainerStyle={styles.contentContainer}>
-            <Content />
-          </BottomSheetScrollView>
-        </View>
+        <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+          <Content />
+        </BottomSheetScrollView>
       </BottomSheet>
     </View>
   );
@@ -93,7 +128,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   buttomSheetStyle: {
-    borderWidth: 1,
     borderRadius: 0,
   },
   contentContainer: {
@@ -121,7 +155,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   vButton: {
-    zIndex: 1000,
+    zIndex: 100,
     borderRadius: 0,
     width: '100%',
     height: 40,
