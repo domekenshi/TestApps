@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import {useNavigation} from '@react-navigation/native';
+// import {useNavigation} from '@react-navigation/native';
 
 /**
  * ダミー
@@ -35,7 +35,7 @@ const Gorhom = ({Content = DefaultContent}) => {
   const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
   const animatedPosition = useSharedValue(0);
   const opacity = useSharedValue(1);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -93,20 +93,24 @@ const Gorhom = ({Content = DefaultContent}) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.background}
+        activeOpacity={1}
+        onPress={handleBackgroundPress}>
+        <View style={styles.bottonContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              bottomSheetRef.current?.snapToIndex(1);
+            }}>
+            <Text style={styles.button}>botton</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
       <AnimatedTouchableOpacity
         style={[styles.vButton, animatedStyle]}
         onPress={handleVButtonPress}>
         <Text style={styles.vButtonText}>V</Text>
       </AnimatedTouchableOpacity>
-
-      <View style={styles.bottonContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            bottomSheetRef.current?.snapToIndex(1);
-          }}>
-          <Text style={styles.button}>botton</Text>
-        </TouchableOpacity>
-      </View>
 
       <BottomSheet
         backgroundStyle={styles.buttomSheetStyle}
@@ -125,6 +129,10 @@ const Gorhom = ({Content = DefaultContent}) => {
 };
 
 const styles = StyleSheet.create({
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
+  },
   container: {
     flex: 1,
     backgroundColor: '#e0f9e5',
