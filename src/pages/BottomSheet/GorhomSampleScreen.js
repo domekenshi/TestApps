@@ -1,5 +1,11 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import Animated, {
   useSharedValue,
@@ -7,8 +13,10 @@ import Animated, {
   useAnimatedReaction,
   withTiming,
   Easing,
+  runOnJS,
 } from 'react-native-reanimated';
 // import {useNavigation} from '@react-navigation/native';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 /**
  * ダミー
@@ -24,7 +32,7 @@ const DefaultContent = () => (
     ))}
   </View>
 );
-
+const statusBarHeight = getStatusBarHeight();
 // アニメーション用のTouchableOpacity;作成
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -32,10 +40,11 @@ const AnimatedTouchableOpacity =
 const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef(null);
   const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-  const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
+  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
   const animatedPosition = useSharedValue(0);
   const opacity = useSharedValue(1);
   // const navigation = useNavigation();
+  // ステータスバーの高さを取得
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -68,31 +77,47 @@ const Gorhom = ({Content = DefaultContent}) => {
   }, [isFullyExpanded]);
 
   const handleBackgroundPress = useCallback(() => {
+    console.log(bottomSheetRef.current);
     if (bottomSheetRef.current) {
       bottomSheetRef.current.collapse();
     }
   }, []);
+
+  const logPosition = useCallback(position => {
+    console.log('現在の位置情報:', position);
+  }, []);
+
   useAnimatedReaction(
     () => animatedPosition.value,
     position => {
+      // 数字が低いほどトップに近い
+      const maxSnapPoint = 90; // スナップポイントの最大値（90%）
+      const fadeStartPoint = 110; // ヘッダーがフェードアウトし始めるポイント
       let newOpacity;
-      if (position <= 0) {
+      if (maxSnapPoint >= position) {
         newOpacity = 1;
-      } else if (position >= 100) {
+      } else if (fadeStartPoint <= position) {
         newOpacity = 0;
       } else {
-        newOpacity = 1 - position / 100;
+        // フェードアウトの範囲を縮小して、より早く変化が始まるように調整
+        newOpacity = maxSnapPoint / position;
       }
-
       opacity.value = withTiming(newOpacity, {
-        duration: 30,
-        easing: Easing.out(Easing.cubic),
+        duration: 250,
+        easing: Easing.inOut(Easing.ease),
       });
+      // デバック用ボトムシート位置情報取得
+      runOnJS(logPosition)(position);
     },
   );
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <TouchableOpacity
         style={styles.background}
         activeOpacity={1}
@@ -120,6 +145,7 @@ const Gorhom = ({Content = DefaultContent}) => {
         animatedPosition={animatedPosition}
         onChange={handleSheetChanges}
         enablePanDownToClose={true}>
+        {/* ScrollViewが使われていたら内部のScrollViewにnestedScrollEnabled={true} */}
         <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
           <Content />
         </BottomSheetScrollView>
@@ -177,13 +203,13 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   vButton: {
-    zIndex: 100,
+    zIndex: 200,
     borderRadius: 0,
     width: '100%',
-    height: 40,
+    height: 60 + statusBarHeight,
     paddingLeft: 20,
-    paddingTop: 10,
-    backgroundColor: 'white',
+    paddingTop: statusBarHeight + 10,
+    backgroundColor: '#f0efef',
   },
   vButtonText: {
     color: '#000000',
