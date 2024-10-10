@@ -7,8 +7,8 @@ import Animated, {
   useAnimatedReaction,
   withTiming,
   Easing,
-  runOnJS,
 } from 'react-native-reanimated';
+import {useNavigation} from '@react-navigation/native';
 
 /**
  * ダミー
@@ -35,6 +35,7 @@ const Gorhom = ({Content = DefaultContent}) => {
   const snapPoints = useMemo(() => ['25%', '50%', '100%'], []);
   const animatedPosition = useSharedValue(0);
   const opacity = useSharedValue(1);
+  const navigation = useNavigation();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -43,20 +44,34 @@ const Gorhom = ({Content = DefaultContent}) => {
   });
 
   const handleSheetChanges = useCallback(index => {
-    // 100％
-    setIsFullyExpanded(index === 2);
+    const isExpand = index === 2;
+    if (isExpand) {
+      setIsFullyExpanded(isExpand);
+      // navigation.setOptions({
+      //   headerShown: false,
+      // });
+    }
+    // else {
+    //   navigation.setOptions({
+    //     headerShown: true,
+    //   });
+    // }
   }, []);
 
   const handleVButtonPress = useCallback(() => {
     if (isFullyExpanded) {
       bottomSheetRef.current?.snapToIndex(1);
+      // navigation.setOptions({
+      //   headerShown: true,
+      // });
     }
   }, [isFullyExpanded]);
 
-  const logPosition = useCallback(position => {
-    console.log('Current animatedPosition:', position);
+  const handleBackgroundPress = useCallback(() => {
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.collapse();
+    }
   }, []);
-
   useAnimatedReaction(
     () => animatedPosition.value,
     position => {
@@ -73,7 +88,6 @@ const Gorhom = ({Content = DefaultContent}) => {
         duration: 30,
         easing: Easing.out(Easing.cubic),
       });
-      runOnJS(logPosition)(position);
     },
   );
 

@@ -16,6 +16,7 @@ import Detail from './src/pages/detail';
 import Gorhom from './src/pages/BottomSheet/GorhomSampleScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
+
 function App() {
   return (
     <NavigationContainer>
@@ -25,7 +26,11 @@ function App() {
         <Stack.Screen name="Detail" component={Detail} />
         <Stack.Screen name="Animation" component={Animation} />
         <Stack.Screen name="Scaling" component={Scaling} />
-        <Stack.Screen name="Gorhom" component={Gorhom} />
+        <Stack.Screen
+          name="Gorhom"
+          component={Gorhom}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
