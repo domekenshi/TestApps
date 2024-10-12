@@ -1,4 +1,7 @@
 {
   "java.configuration.updateBuildConfiguration": "disabled",
-  "java.compile.nullAnalysis.mode": "disabled"
+  "java.compile.nullAnalysis.mode": "disabled",
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "json.validate.enable": false
 }
