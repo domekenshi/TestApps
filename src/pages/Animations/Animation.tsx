@@ -1,19 +1,31 @@
 import React from 'react';
-import {FlatList, Text, View, StyleSheet} from 'react-native';
+import {FlatList, Text, View, StyleSheet, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../types/RootStackParamList';
 
 export default function Animation(props?) {
-  const subItem = props.route.params.subItem;
+  const {subItem} = props.route.params;
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const renderItem = ({item}) => {
     return (
-      <View style={styles.item}>
-        <Text style={styles.title}>{item.name}</Text>
-      </View>
+      <TouchableOpacity
+        key={item.name}
+        onPress={() => {
+          navigation.push(item.root);
+        }}>
+        <View style={styles.item}>
+          <Text style={styles.title}>{item.name}</Text>
+        </View>
+      </TouchableOpacity>
     );
   };
   return (
-    <>
-      <FlatList data={subItem} renderItem={renderItem} />
-    </>
+    <FlatList
+      keyExtractor={item => item.name}
+      data={subItem}
+      renderItem={renderItem}
+    />
   );
 }
 

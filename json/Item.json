@@ -14,12 +14,16 @@
     "root": "Animation",
     "subItem": [
       {
-        "name": "sub1",
-        "root": "sub1"
+        "name": "Scaling",
+        "root": "Scaling"
       },
       {
-        "name": "sub2",
-        "root": "sub2"
+        "name": "Translate",
+        "root": "Translate"
+      },
+      {
+        "name": "AnimationTest",
+        "root": "AnimationTest"
       }
     ]
   },

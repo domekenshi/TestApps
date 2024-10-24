@@ -6,8 +6,10 @@ import {SubItemType} from '../types/types';
 export type RootStackParamList = {
   Home: undefined; // ホーム画面にはパラメータが不要
   Todo: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
-  Detail: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
-  Animation: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
-  Scaling: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
-  Gorhom: {subItem: SubItemType | null}; // 詳細画面にはitemIdとotherParamが必要
+  Detail: {subItem: SubItemType | null};
+  Animation: {subItem: SubItemType | null};
+  Scaling: {subItem: SubItemType | null};
+  Translate: {subItem: SubItemType | null};
+  AnimationTest: {AnimationTest: SubItemType | null};
+  Gorhom: {subItem: SubItemType | null};
 };
