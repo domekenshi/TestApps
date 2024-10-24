@@ -16,6 +16,7 @@ import Translate from './src/pages/Animations/Translate';
 import AnimationTest from './src/pages/Animations/AnimationTest';
 import Detail from './src/pages/detail';
 import Gorhom from './src/pages/BottomSheet/GorhomSampleScreen';
+import CommonTest from './src/pages/Test/commonTest';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -35,6 +36,7 @@ function App() {
           component={Gorhom}
           options={{headerShown: false}}
         />
+        <Stack.Screen name="CommonTest" component={CommonTest} />
       </Stack.Navigator>
     </NavigationContainer>
   );

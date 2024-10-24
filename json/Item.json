@@ -38,8 +38,8 @@
     "subItem": []
   },
   {
-    "name": "項目6",
-    "root": "Detail",
+    "name": "汎用テスト",
+    "root": "CommonTest",
     "subItem": []
   }
 ]

@@ -12,4 +12,5 @@ export type RootStackParamList = {
   Translate: {subItem: SubItemType | null};
   AnimationTest: {AnimationTest: SubItemType | null};
   Gorhom: {subItem: SubItemType | null};
+  CommonTest: {subItem: SubItemType | null};
 };
