@@ -5,7 +5,8 @@ import {getMapProvider, getMapType} from './mapUtil';
 import {MAP_TYPES, INITIAL_REGION} from '../common/const';
 // import OverlayComponent from './components/overlay/OverlayComponent';
 // import MarkerComponent from './components/marker/MarkerComponent';
-import BusMarkerComponent from './components/marker/BusMarkerComponent';
+// import BusMarkerComponent from './components/marker/BusMarkerComponent';
+import LatLonMoveMarkerComponent from './components/marker/LatLonMoveMarkerComponent';
 const {width, height} = Dimensions.get('window');
 
 // provider 0:google 1:undefind
@@ -14,7 +15,7 @@ const PROVIDER_TYPE = 0;
 const RootMapScreen = () => {
   return (
     <>
-      <MapView
+      <MapView.Animated
         provider={getMapProvider(PROVIDER_TYPE)}
         // region={RESION}
         // customMapStyle={[]}
@@ -52,9 +53,10 @@ const RootMapScreen = () => {
         // cameraZoomRange={}
         onMapReady={() => {}}>
         {/* <MarkerComponent /> */}
-        <BusMarkerComponent />
+        {/* <BusMarkerComponent /> */}
         {/* <OverlayComponent /> */}
-      </MapView>
+        <LatLonMoveMarkerComponent />
+      </MapView.Animated>
     </>
   );
 };

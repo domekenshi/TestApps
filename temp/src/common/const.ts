@@ -37,8 +37,8 @@ export const RESION = {
  */
 export const INITIAL_REGION = {
   TOKYO: {
-    latitude: 35.6576,
-    longitude: 139.7444,
+    latitude: 35.680959106959,
+    longitude: 139.76730676352,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   },
