@@ -19,6 +19,54 @@ import Animated, {
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 /**
+ * タブコンポーネント
+ * @returns
+ */
+const ScrolleButton = () => {
+  const buttonItem = useMemo(
+    () => [
+      {title: 'btn1'},
+      {title: 'btn2'},
+      {title: 'btn3'},
+      {title: 'btn4'},
+      {title: 'btn5'},
+      {title: 'btn6'},
+    ],
+    [],
+  );
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const setActiveTab = useCallback(
+    index => {
+      setActiveIndex(index);
+    },
+    [activeIndex],
+  );
+
+  return (
+    <BottomSheetScrollView
+      horizontal={true} //横スクロールを有効
+      showsHorizontalScrollIndicator={false} //スクロールバー
+      contentContainerStyle={styles.bottomsheetscrollrow}>
+      {buttonItem.map((item, index) => {
+        return (
+          <View key={index}>
+            <AnimatedTouchableOpacity
+              style={[
+                styles.btnContainer,
+                {backgroundColor: activeIndex === index ? 'aqua' : 'gray'},
+              ]}
+              onPress={() => setActiveTab()}>
+              <Text style={styles.btnTxt}>{item.title}</Text>
+            </AnimatedTouchableOpacity>
+          </View>
+        );
+      })}
+    </BottomSheetScrollView>
+  );
+};
+/**
  * ダミー
  * @returns
  */
@@ -145,6 +193,7 @@ const Gorhom = ({Content = DefaultContent}) => {
         animatedPosition={animatedPosition}
         onChange={handleSheetChanges}
         enablePanDownToClose={true}>
+        <ScrolleButton />
         {/* ScrollViewが使われていたら内部のScrollViewにnestedScrollEnabled={true} */}
         <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
           <Content />
@@ -158,6 +207,21 @@ const styles = StyleSheet.create({
   background: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 0,
+  },
+  bottomsheetscrollrow: {
+    flexDirection: 'row',
+    backgroundColor: 'red',
+    paddingHorizontal: 10, // 横方向のパディングを追加
+    gap: 20,
+    height: 80,
+  },
+
+  btnContainer: {
+    backgroundColor: 'aqua',
+    borderRadius: 5,
+  },
+  btnTxt: {
+    fontSize: 40,
   },
   container: {
     flex: 1,
