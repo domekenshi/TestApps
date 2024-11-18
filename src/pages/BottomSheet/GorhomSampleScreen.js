@@ -1,12 +1,16 @@
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState, memo} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  ScrollView,
 } from 'react-native';
-import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -17,12 +21,14 @@ import Animated, {
 } from 'react-native-reanimated';
 // import {useNavigation} from '@react-navigation/native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-
+const handleScroll = event => {
+  console.log('Scroll event:', event.nativeEvent.contentOffset);
+};
 /**
  * タブコンポーネント
  * @returns
  */
-const ScrolleButton = () => {
+const ScrolleButton = memo(() => {
   const buttonItem = useMemo(
     () => [
       {title: 'btn1'},
@@ -47,25 +53,30 @@ const ScrolleButton = () => {
   return (
     <BottomSheetScrollView
       horizontal={true} //横スクロールを有効
-      showsHorizontalScrollIndicator={false} //スクロールバー
-      contentContainerStyle={styles.bottomsheetscrollrow}>
+      scrollEnabled={true}
+      enableOverDrag={false}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      nestedScrollEnabled={true}
+      showsHorizontalScrollIndicator={false}
+      Style={styles.bottomsheetscrollrow}>
       {buttonItem.map((item, index) => {
         return (
-          <View key={index}>
+          <BottomSheetView key={index}>
             <AnimatedTouchableOpacity
               style={[
                 styles.btnContainer,
                 {backgroundColor: activeIndex === index ? 'aqua' : 'gray'},
               ]}
-              onPress={() => setActiveTab()}>
+              onPress={() => setActiveTab(index)}>
               <Text style={styles.btnTxt}>{item.title}</Text>
             </AnimatedTouchableOpacity>
-          </View>
+          </BottomSheetView>
         );
       })}
     </BottomSheetScrollView>
   );
-};
+});
 /**
  * ダミー
  * @returns
@@ -88,7 +99,7 @@ const AnimatedTouchableOpacity =
 const Gorhom = ({Content = DefaultContent}) => {
   const bottomSheetRef = useRef(null);
   const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+  const snapPoints = useMemo(() => ['25%', '70%', '90%'], []);
   const animatedPosition = useSharedValue(0);
   const opacity = useSharedValue(1);
   // const navigation = useNavigation();
@@ -192,12 +203,17 @@ const Gorhom = ({Content = DefaultContent}) => {
         snapPoints={snapPoints}
         animatedPosition={animatedPosition}
         onChange={handleSheetChanges}
+        enableContentPanningGesture={true}
         enablePanDownToClose={true}>
-        <ScrolleButton />
         {/* ScrollViewが使われていたら内部のScrollViewにnestedScrollEnabled={true} */}
-        <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+        <ScrolleButton />
+        {/* <BottomSheetScrollView
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.contentContainer}>
+          <ScrolleButton />
           <Content />
-        </BottomSheetScrollView>
+        </BottomSheetScrollView> */}
       </BottomSheet>
     </View>
   );
@@ -209,11 +225,12 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   bottomsheetscrollrow: {
+    // flex: 1,
     flexDirection: 'row',
     backgroundColor: 'red',
     paddingHorizontal: 10, // 横方向のパディングを追加
     gap: 20,
-    height: 80,
+    height: '100%',
   },
 
   btnContainer: {
