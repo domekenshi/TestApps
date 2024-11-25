@@ -5,6 +5,11 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../types/RootStackParamList';
 
+/**
+ * 項目リスト
+ * メニューのカテゴリー項目リスト
+ * @returns JSX.Element
+ */
 export default function ItemList(): JSX.Element {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const items = itemList.map(item => {
