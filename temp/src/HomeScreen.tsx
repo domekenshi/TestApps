@@ -14,6 +14,12 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 type navProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
+
+/**
+ * ホーム画面
+ * @param param0.navigation
+ * @returns ホーム画面
+ */
 export default function HomeScreen({navigation}: navProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {

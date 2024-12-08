@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState} from 'react';
+import React, {useRef, useEffect, useState, useMemo} from 'react';
 import {Marker, AnimatedRegion} from 'react-native-maps';
 
 const LatLonMoveMarkerComponent = () => {
@@ -26,14 +26,17 @@ const LatLonMoveMarkerComponent = () => {
   //       }
   //     });
   // 東京駅周辺の座標リスト
-  const locations = [
-    {latitude: 35.681236, longitude: 139.767125}, // 中心: 東京駅
-    {latitude: 35.689236, longitude: 139.767225}, // 東京駅の北
-    {latitude: 35.681436, longitude: 139.769525}, // 東京駅の東
-    {latitude: 35.680036, longitude: 139.767425}, // 東京駅の南
-    {latitude: 35.681536, longitude: 139.764725}, // 東京駅の西
-    {latitude: 35.689236, longitude: 139.767225}, // 東京駅の北
-  ];
+  const locations = useMemo(
+    () => [
+      {latitude: 35.681236, longitude: 139.767125}, // 中心: 東京駅
+      {latitude: 35.689236, longitude: 139.767225}, // 東京駅の北
+      {latitude: 35.681436, longitude: 139.769525}, // 東京駅の東
+      {latitude: 35.680036, longitude: 139.767425}, // 東京駅の南
+      {latitude: 35.681536, longitude: 139.764725}, // 東京駅の西
+      {latitude: 35.689236, longitude: 139.767225}, // 東京駅の北
+    ],
+    [],
+  ); // 空の依存配列
   // `AnimatedRegion`のインスタンスを作成
   const [coordinate] = useState(
     new AnimatedRegion({
@@ -54,22 +57,24 @@ const LatLonMoveMarkerComponent = () => {
     const intervalId = setInterval(() => {
       currentIndex = (currentIndex + 1) % locations.length;
 
-      const newLocation = locations[currentIndex];
+      // const newLocation = locations[currentIndex];
 
       // マーカーを新しい座標にアニメーションさせる
-      coordinate
-        .timing({
-          latitude: newLocation.latitude,
-          longitude: newLocation.longitude,
-          duration: 2000, // アニメーションの持続時間（ミリ秒）
-          useNativeDriver: false,
-        })
-        .start();
+      // coordinate.timing({
+      //   toValue: {
+      //     latitude: newLocation.latitude,
+      //     longitude: newLocation.longitude,
+      //     latitudeDelta: 0.03,
+      //     longitudeDelta: 0.03,
+      //   } as unknown as number, // 型アサーションを追加
+      //   duration: 2000,
+      //   useNativeDriver: false,
+      // });
     }, 2000); // 2000ミリ秒（2秒）間隔
 
     // コンポーネントがアンマウントされたらインターバルをクリア
     return () => clearInterval(intervalId);
-  }, [coordinate]);
+  }, [locations, coordinate]);
 
   return (
     <Marker.Animated
@@ -77,7 +82,7 @@ const LatLonMoveMarkerComponent = () => {
       title={'title'}
       description={'description'}
       //   image={require('../../../../assets/images/panda.jpg')}
-      coordinate={coordinate}
+      coordinate={coordinate as any}
       //     animateMarkerToCoordinate={{
       //         35.682599088059,
       //         139.77350117154,
